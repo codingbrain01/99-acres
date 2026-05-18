@@ -31,6 +31,12 @@ type LeadFormConfig = {
   fields: LeadField[]
 }
 
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void
+  }
+}
+
 type IconName =
   | 'arrow'
   | 'building'
@@ -420,6 +426,10 @@ const navigateTo = (path: string) => (event: MouseEvent<HTMLAnchorElement>) => {
   scrollToRoute(path)
 }
 
+const trackLeadEvent = () => {
+  window.fbq?.('track', 'Lead')
+}
+
 function LeadForm({ config }: { config: LeadFormConfig }) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
@@ -452,6 +462,7 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
       }
 
       setStatus('sent')
+      trackLeadEvent()
       form.reset()
     } catch {
       setStatus('error')
