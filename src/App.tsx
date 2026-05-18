@@ -396,14 +396,14 @@ function App() {
       </header>
 
       <main id="top">
-        <section className="relative isolate grid min-h-[690px] overflow-hidden px-4 py-20 sm:px-6 sm:py-24 lg:min-h-[760px] lg:px-10 lg:py-28 xl:px-16">
+        <section className="relative isolate grid min-h-172.5 overflow-hidden px-4 py-20 sm:px-6 sm:py-24 lg:min-h-190 lg:px-10 lg:py-28 xl:px-16">
           <img
             className="absolute inset-0 -z-20 h-full w-full object-cover"
             src={propertyHero}
             alt="Modern residential buildings in Delhi NCR"
           />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/95 via-emerald-950/75 to-slate-950/20" />
-          <div className="absolute inset-x-0 bottom-0 -z-10 h-52 bg-gradient-to-t from-[#f4f7f2] to-transparent" />
+          <div className="absolute inset-0 -z-10 bg-linear-to-r from-slate-950/95 via-emerald-950/75 to-slate-950/20" />
+          <div className="absolute inset-x-0 bottom-0 -z-10 h-52 bg-linear-to-t from-[#f4f7f2] to-transparent" />
 
           <div className="mx-auto grid w-full max-w-7xl items-center gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(340px,0.55fr)]">
             <div className="max-w-3xl text-white">
@@ -573,7 +573,7 @@ function App() {
         </section>
 
         <section className="px-4 pb-16 sm:px-6 lg:px-10 lg:pb-24 xl:px-16">
-          <div className="mx-auto grid max-w-7xl gap-6 rounded-lg bg-gradient-to-br from-emerald-900 via-emerald-800 to-amber-900 p-6 text-white shadow-2xl shadow-emerald-950/20 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:p-10">
+          <div className="mx-auto grid max-w-7xl gap-6 rounded-lg bg-linear-to-br from-emerald-900 via-emerald-800 to-amber-900 p-6 text-white shadow-2xl shadow-emerald-950/20 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:p-10">
             <div>
               <p className="mb-3 text-sm font-extrabold uppercase text-amber-200">
                 Start today
