@@ -4,3 +4,17 @@
   --font-sans: "Aptos", "Segoe UI", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Aptos Display", "Segoe UI", "Inter", ui-sans-serif, system-ui, sans-serif;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+a,
+button,
+select,
+summary,
+[role='button'],
+[type='button'],
+[type='submit'] {
+  cursor: pointer;
+}

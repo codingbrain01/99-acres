@@ -1,4 +1,4 @@
-import type { FormEvent, ReactNode } from 'react'
+import { useEffect, useState, type FormEvent, type MouseEvent, type ReactNode } from 'react'
 import propertyHero from './assets/property-hero.png'
 
 const WHATSAPP_NUMBER = '918800771215'
@@ -12,6 +12,11 @@ type LeadField = {
   required?: boolean
   as?: 'input' | 'select' | 'textarea'
   rows?: number
+  maxLength?: number
+  inputMode?: 'numeric' | 'tel' | 'text'
+  pattern?: string
+  autoComplete?: string
+  inputKind?: 'letters' | 'numbers'
   options?: string[]
 }
 
@@ -80,6 +85,15 @@ const featureCards: { title: string; text: string; icon: IconName }[] = [
   },
 ]
 
+const routeTargets: Record<string, string> = {
+  '/': 'top',
+  '/rent': 'rent',
+  '/owner': 'owner',
+  '/buy': 'buy',
+  '/why': 'why',
+  '/coverage': 'coverage',
+}
+
 const leadForms: LeadFormConfig[] = [
   {
     id: 'rent',
@@ -95,6 +109,9 @@ const leadForms: LeadFormConfig[] = [
         label: 'Full Name',
         placeholder: 'Enter your full name',
         required: true,
+        maxLength: 80,
+        autoComplete: 'name',
+        inputKind: 'letters',
       },
       {
         name: 'rent_phone',
@@ -102,6 +119,11 @@ const leadForms: LeadFormConfig[] = [
         placeholder: 'Enter your mobile number',
         type: 'tel',
         required: true,
+        maxLength: 15,
+        inputMode: 'numeric',
+        pattern: '[0-9]{7,15}',
+        autoComplete: 'tel',
+        inputKind: 'numbers',
       },
       {
         name: 'rent_location',
@@ -124,6 +146,10 @@ const leadForms: LeadFormConfig[] = [
         label: 'Monthly Budget',
         placeholder: 'Monthly rent budget',
         required: true,
+        maxLength: 40,
+        inputMode: 'numeric',
+        pattern: '[0-9]{1,40}',
+        inputKind: 'numbers',
       },
       {
         name: 'rent_details',
@@ -131,6 +157,7 @@ const leadForms: LeadFormConfig[] = [
         placeholder: 'Move-in date, family/company use, furnishing preference',
         as: 'textarea',
         rows: 4,
+        maxLength: 600,
       },
     ],
   },
@@ -148,6 +175,9 @@ const leadForms: LeadFormConfig[] = [
         label: 'Owner Name',
         placeholder: 'Enter owner name',
         required: true,
+        maxLength: 80,
+        autoComplete: 'name',
+        inputKind: 'letters',
       },
       {
         name: 'owner_phone',
@@ -155,6 +185,11 @@ const leadForms: LeadFormConfig[] = [
         placeholder: 'Enter your mobile number',
         type: 'tel',
         required: true,
+        maxLength: 15,
+        inputMode: 'numeric',
+        pattern: '[0-9]{7,15}',
+        autoComplete: 'tel',
+        inputKind: 'numbers',
       },
       {
         name: 'property_location',
@@ -185,6 +220,10 @@ const leadForms: LeadFormConfig[] = [
         label: 'Expected Price',
         placeholder: 'Expected rent or sale price',
         required: true,
+        maxLength: 40,
+        inputMode: 'numeric',
+        pattern: '[0-9]{1,40}',
+        inputKind: 'numbers',
       },
       {
         name: 'property_details',
@@ -192,6 +231,7 @@ const leadForms: LeadFormConfig[] = [
         placeholder: 'Area, furnishing, floor, possession and any key details',
         as: 'textarea',
         rows: 4,
+        maxLength: 600,
       },
     ],
   },
@@ -209,6 +249,9 @@ const leadForms: LeadFormConfig[] = [
         label: 'Full Name',
         placeholder: 'Enter your full name',
         required: true,
+        maxLength: 80,
+        autoComplete: 'name',
+        inputKind: 'letters',
       },
       {
         name: 'buy_phone',
@@ -216,6 +259,11 @@ const leadForms: LeadFormConfig[] = [
         placeholder: 'Enter your mobile number',
         type: 'tel',
         required: true,
+        maxLength: 15,
+        inputMode: 'numeric',
+        pattern: '[0-9]{7,15}',
+        autoComplete: 'tel',
+        inputKind: 'numbers',
       },
       {
         name: 'buy_location',
@@ -238,6 +286,10 @@ const leadForms: LeadFormConfig[] = [
         label: 'Buying Budget',
         placeholder: 'Buying budget',
         required: true,
+        maxLength: 40,
+        inputMode: 'numeric',
+        pattern: '[0-9]{1,40}',
+        inputKind: 'numbers',
       },
       {
         name: 'buy_details',
@@ -245,6 +297,7 @@ const leadForms: LeadFormConfig[] = [
         placeholder: 'Tell us your requirement',
         as: 'textarea',
         rows: 4,
+        maxLength: 600,
       },
     ],
   },
@@ -337,34 +390,74 @@ function Icon({ name, className = 'size-5' }: { name: IconName; className?: stri
 }
 
 const whatsappLink = (message: string) =>
-  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+  `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`
 
-const formatFieldName = (name: string) =>
-  name
-    .replace(/^(rent|buy|owner)_/, '')
-    .replaceAll('_', ' ')
-    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+const sanitizeFieldInput = (value: string, inputKind?: LeadField['inputKind']) => {
+  if (inputKind === 'letters') {
+    return value.replace(/[^A-Za-z\s]/g, '').replace(/\s+/g, ' ')
+  }
 
-function submitToWhatsApp(event: FormEvent<HTMLFormElement>, subject: string) {
+  if (inputKind === 'numbers') {
+    return value.replace(/\D/g, '')
+  }
+
+  return value
+}
+
+const targetForPath = (path: string) => routeTargets[path] || 'top'
+
+const scrollToRoute = (path: string) => {
+  const target = document.getElementById(targetForPath(path))
+
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
+const navigateTo = (path: string) => (event: MouseEvent<HTMLAnchorElement>) => {
   event.preventDefault()
-
-  const form = event.currentTarget
-  const fields = Array.from(new FormData(form).entries())
-    .map(([name, value]) => [formatFieldName(name), String(value).trim()])
-    .filter(([, value]) => value.length > 0)
-
-  const message = [
-    `New ${subject}`,
-    'Source: 99 Acres lead page',
-    '',
-    ...fields.map(([name, value]) => `${name}: ${value}`),
-  ].join('\n')
-
-  window.open(whatsappLink(message), '_blank', 'noopener,noreferrer')
-  form.reset()
+  window.history.pushState({}, '', path)
+  scrollToRoute(path)
 }
 
 function LeadForm({ config }: { config: LeadFormConfig }) {
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  async function submitToTelegram(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setStatus('sending')
+
+    const form = event.currentTarget
+    const fields = Object.fromEntries(
+      Array.from(new FormData(form).entries()).map(([name, value]) => [
+        name,
+        String(value).trim().replace(/\s+/g, ' '),
+      ]),
+    )
+
+    try {
+      const response = await fetch('/.netlify/functions/telegram-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject: config.subject,
+          fields,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Lead submission failed')
+      }
+
+      setStatus('sent')
+      form.reset()
+    } catch {
+      setStatus('error')
+    }
+  }
+
   return (
     <article
       className="scroll-mt-28 rounded-lg border border-slate-200 bg-white p-5 shadow-xl shadow-emerald-950/5 sm:p-6"
@@ -385,7 +478,17 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
         <p className="mt-3 text-sm leading-6 text-slate-600">{config.description}</p>
       </div>
 
-      <form className="grid gap-4" onSubmit={(event) => submitToWhatsApp(event, config.subject)}>
+      <form className="grid gap-4" onSubmit={submitToTelegram} autoComplete="off">
+        <label className="hidden" aria-hidden="true">
+          Company website
+          <input
+            name="company_website"
+            tabIndex={-1}
+            autoComplete="off"
+            className="hidden"
+          />
+        </label>
+
         {config.fields.map((field) => {
           if (field.as === 'textarea') {
             return (
@@ -397,6 +500,8 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
                   placeholder={field.placeholder}
                   rows={field.rows ?? 4}
                   required={field.required}
+                  maxLength={field.maxLength}
+                  autoComplete="off"
                 />
               </label>
             )
@@ -411,6 +516,7 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
                   name={field.name}
                   defaultValue=""
                   required={field.required}
+                  autoComplete="off"
                 >
                   <option value="" disabled>
                     {field.placeholder}
@@ -434,28 +540,64 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
                 name={field.name}
                 placeholder={field.placeholder}
                 required={field.required}
+                maxLength={field.maxLength}
+                inputMode={field.inputMode}
+                pattern={field.pattern}
+                autoComplete="off"
+                onInput={(event) => {
+                  event.currentTarget.value = sanitizeFieldInput(
+                    event.currentTarget.value,
+                    field.inputKind,
+                  )
+                }}
               />
             </label>
           )
         })}
 
-        <button className={`${primaryButtonClass} mt-2 w-full gap-2`} type="submit">
-          {config.submitLabel}
+        <button
+          className={`${primaryButtonClass} mt-2 w-full gap-2 disabled:cursor-not-allowed disabled:opacity-70`}
+          type="submit"
+          disabled={status === 'sending'}
+        >
+          {status === 'sending' ? 'Sending Lead...' : config.submitLabel}
           <Icon name="arrow" className="size-4" />
         </button>
+
+        {status === 'sent' && (
+          <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800">
+            Lead received. Our team will contact you shortly.
+          </p>
+        )}
+
+        {status === 'error' && (
+          <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+            Could not send this lead. Please use the WhatsApp button or try again.
+          </p>
+        )}
       </form>
     </article>
   )
 }
 
 function App() {
+  useEffect(() => {
+    const handleRouteChange = () => scrollToRoute(window.location.pathname)
+
+    window.setTimeout(handleRouteChange, 0)
+    window.addEventListener('popstate', handleRouteChange)
+
+    return () => window.removeEventListener('popstate', handleRouteChange)
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#f4f7f2] font-sans text-slate-950 antialiased">
       <header className="sticky top-0 z-30 border-b border-white/70 bg-white/90 px-4 py-3 shadow-sm shadow-slate-950/5 backdrop-blur-xl sm:px-6 lg:px-10 xl:px-16">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <a
             className="flex min-w-0 items-center gap-3"
-            href="#top"
+            href="/"
+            onClick={navigateTo('/')}
             aria-label="Delhi NCR Property Leads home"
           >
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-emerald-950 text-white">
@@ -467,19 +609,32 @@ function App() {
           </a>
 
           <nav className="hidden items-center gap-1 rounded-lg bg-slate-100 p-1 text-sm font-bold text-slate-700 lg:flex">
-            <a className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800" href="#rent">
+            <a
+              className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800"
+              href="/rent"
+              onClick={navigateTo('/rent')}
+            >
               Rent
             </a>
             <a
               className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800"
-              href="#owner"
+              href="/owner"
+              onClick={navigateTo('/owner')}
             >
               Sell / Rent Out
             </a>
-            <a className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800" href="#buy">
+            <a
+              className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800"
+              href="/buy"
+              onClick={navigateTo('/buy')}
+            >
               Buy
             </a>
-            <a className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800" href="#why">
+            <a
+              className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800"
+              href="/why"
+              onClick={navigateTo('/why')}
+            >
               Why Us
             </a>
           </nav>
@@ -521,7 +676,7 @@ function App() {
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a className={`${primaryButtonClass} gap-2`} href="#rent">
+                <a className={`${primaryButtonClass} gap-2`} href="/rent" onClick={navigateTo('/rent')}>
                   Get Started
                   <Icon name="arrow" className="size-4" />
                 </a>
@@ -540,11 +695,11 @@ function App() {
             <aside className="rounded-lg border border-white/20 bg-white/10 p-5 text-white shadow-2xl shadow-slate-950/20 backdrop-blur-xl sm:p-6">
               <p className="text-sm font-extrabold text-amber-300">Lead desk</p>
               <h2 className="font-display mt-2 text-2xl font-black leading-tight">
-                Submit once. Follow up on WhatsApp.
+                Submit once. Get logged instantly.
               </h2>
               <p className="mt-3 text-sm leading-6 text-white/75">
-                Each form opens a clean lead message with the prospect details,
-                ready for your team to contact.
+                Each form validates the details, saves the lead, and alerts your
+                team for quick follow-up.
               </p>
 
               <dl className="mt-6 grid gap-3">
@@ -582,8 +737,7 @@ function App() {
             </div>
             <p className="max-w-2xl text-lg leading-8 text-slate-600">
               Visitors can submit the right requirement quickly, and every
-              submission opens directly in WhatsApp with clean lead details for
-              follow-up.
+              submission is validated before it reaches your lead workflow.
             </p>
           </div>
         </section>
@@ -652,6 +806,7 @@ function App() {
 
         <section
           className="px-4 py-16 sm:px-6 lg:px-10 lg:py-20 xl:px-16"
+          id="coverage"
           aria-labelledby="coverage-title"
         >
           <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.75fr_1fr] lg:items-center">
@@ -694,7 +849,11 @@ function App() {
                 Submit your requirement and our team will contact you shortly.
               </p>
             </div>
-            <a className={`${primaryButtonClass} w-full gap-2 sm:w-auto`} href="#rent">
+            <a
+              className={`${primaryButtonClass} w-full gap-2 sm:w-auto`}
+              href="/rent"
+              onClick={navigateTo('/rent')}
+            >
               Get Started
               <Icon name="arrow" className="size-4" />
             </a>
