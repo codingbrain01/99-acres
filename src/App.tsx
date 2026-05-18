@@ -231,6 +231,17 @@ const leadForms: LeadFormConfig[] = [
   },
 ]
 
+const inputClass =
+  'min-h-12 w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-700 focus:ring-4 focus:ring-emerald-100'
+
+const labelClass = 'grid gap-2 text-sm font-bold text-slate-800'
+
+const primaryButtonClass =
+  'inline-flex min-h-12 items-center justify-center rounded-lg bg-amber-500 px-5 py-3 text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-900/10 transition hover:-translate-y-0.5 hover:bg-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-200'
+
+const secondaryButtonClass =
+  'inline-flex min-h-12 items-center justify-center rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-extrabold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20'
+
 const whatsappLink = (message: string) =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
 
@@ -261,20 +272,28 @@ function submitToWhatsApp(event: FormEvent<HTMLFormElement>, subject: string) {
 
 function LeadForm({ config }: { config: LeadFormConfig }) {
   return (
-    <article className="lead-card" id={config.id}>
-      <div className="lead-card__header">
-        <p>{config.eyebrow}</p>
-        <h3>{config.title}</h3>
-        <span>{config.description}</span>
+    <article
+      className="scroll-mt-28 rounded-lg border border-slate-200 bg-white p-5 shadow-xl shadow-emerald-950/5 sm:p-6"
+      id={config.id}
+    >
+      <div className="mb-6 border-b border-slate-100 pb-5">
+        <p className="mb-2 text-xs font-extrabold uppercase text-emerald-700">
+          {config.eyebrow}
+        </p>
+        <h3 className="text-2xl font-black leading-tight text-slate-950">
+          {config.title}
+        </h3>
+        <p className="mt-3 text-sm leading-6 text-slate-600">{config.description}</p>
       </div>
 
-      <form onSubmit={(event) => submitToWhatsApp(event, config.subject)}>
+      <form className="grid gap-4" onSubmit={(event) => submitToWhatsApp(event, config.subject)}>
         {config.fields.map((field) => {
           if (field.as === 'textarea') {
             return (
-              <label key={field.name} className="field field--wide">
+              <label key={field.name} className={labelClass}>
                 <span>{field.label}</span>
                 <textarea
+                  className={`${inputClass} min-h-28 resize-y`}
                   name={field.name}
                   placeholder={field.placeholder}
                   rows={field.rows ?? 4}
@@ -286,9 +305,14 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
 
           if (field.as === 'select') {
             return (
-              <label key={field.name} className="field">
+              <label key={field.name} className={labelClass}>
                 <span>{field.label}</span>
-                <select name={field.name} defaultValue="" required={field.required}>
+                <select
+                  className={`${inputClass} cursor-pointer`}
+                  name={field.name}
+                  defaultValue=""
+                  required={field.required}
+                >
                   <option value="" disabled>
                     {field.placeholder}
                   </option>
@@ -303,9 +327,10 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
           }
 
           return (
-            <label key={field.name} className="field">
+            <label key={field.name} className={labelClass}>
               <span>{field.label}</span>
               <input
+                className={inputClass}
                 type={field.type ?? 'text'}
                 name={field.name}
                 placeholder={field.placeholder}
@@ -315,7 +340,9 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
           )
         })}
 
-        <button type="submit">{config.submitLabel}</button>
+        <button className={`${primaryButtonClass} mt-2 w-full`} type="submit">
+          {config.submitLabel}
+        </button>
       </form>
     </article>
   )
@@ -323,144 +350,255 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
 
 function App() {
   return (
-    <>
-      <header className="site-header">
-        <a className="brand" href="#top" aria-label="Delhi NCR Property Leads home">
-          <span>99</span>
-          <strong>Delhi NCR Property Leads</strong>
-        </a>
+    <div className="min-h-screen bg-[#f4f7f2] font-sans text-slate-950 antialiased">
+      <header className="sticky top-0 z-30 border-b border-white/70 bg-white/90 px-4 py-3 shadow-sm shadow-slate-950/5 backdrop-blur-xl sm:px-6 lg:px-10 xl:px-16">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <a
+            className="flex min-w-0 items-center gap-3"
+            href="#top"
+            aria-label="Delhi NCR Property Leads home"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-emerald-950 text-sm font-black text-white">
+              99
+            </span>
+            <strong className="max-w-44 text-sm font-black leading-tight text-slate-950 sm:max-w-none sm:text-base">
+              Delhi NCR Property Leads
+            </strong>
+          </a>
 
-        <nav aria-label="Primary navigation">
-          <a href="#rent">Rent</a>
-          <a href="#owner">Sell / Rent Out</a>
-          <a href="#buy">Buy</a>
-          <a href="#why">Why Us</a>
-        </nav>
+          <nav className="hidden items-center gap-1 rounded-lg bg-slate-100 p-1 text-sm font-bold text-slate-700 lg:flex">
+            <a className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800" href="#rent">
+              Rent
+            </a>
+            <a
+              className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800"
+              href="#owner"
+            >
+              Sell / Rent Out
+            </a>
+            <a className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800" href="#buy">
+              Buy
+            </a>
+            <a className="rounded-lg px-4 py-2 hover:bg-white hover:text-emerald-800" href="#why">
+              Why Us
+            </a>
+          </nav>
 
-        <a
-          className="header-action"
-          href={whatsappLink('Hello, I want to discuss property leads in Delhi NCR.')}
-          target="_blank"
-          rel="noreferrer"
-        >
-          WhatsApp
-        </a>
+          <a
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg bg-emerald-800 px-4 py-2 text-sm font-extrabold text-white shadow-lg shadow-emerald-900/10 transition hover:-translate-y-0.5 hover:bg-emerald-950 focus:outline-none focus:ring-4 focus:ring-emerald-200"
+            href={whatsappLink('Hello, I want to discuss property leads in Delhi NCR.')}
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp
+          </a>
+        </div>
       </header>
 
       <main id="top">
-        <section className="hero">
+        <section className="relative isolate grid min-h-[690px] overflow-hidden px-4 py-20 sm:px-6 sm:py-24 lg:min-h-[760px] lg:px-10 lg:py-28 xl:px-16">
           <img
-            className="hero__image"
+            className="absolute inset-0 -z-20 h-full w-full object-cover"
             src={propertyHero}
             alt="Modern residential buildings in Delhi NCR"
           />
-          <div className="hero__overlay" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/95 via-emerald-950/75 to-slate-950/20" />
+          <div className="absolute inset-x-0 bottom-0 -z-10 h-52 bg-gradient-to-t from-[#f4f7f2] to-transparent" />
 
-          <div className="hero__content">
-            <p className="eyebrow">Property leads for Delhi NCR</p>
-            <h1>Delhi NCR Property Leads</h1>
-            <p>
-              Capture rental, selling and buying requirements from serious
-              property prospects across Delhi, Gurgaon, Noida, Ghaziabad,
-              Faridabad and nearby areas.
-            </p>
+          <div className="mx-auto grid w-full max-w-7xl items-center gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(340px,0.55fr)]">
+            <div className="max-w-3xl text-white">
+              <p className="mb-4 text-sm font-extrabold uppercase text-amber-300">
+                Property leads for Delhi NCR
+              </p>
+              <h1 className="text-5xl font-black leading-none text-white sm:text-6xl lg:text-7xl">
+                Delhi NCR Property Leads
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/80">
+                Capture rental, selling and buying requirements from serious
+                property prospects across Delhi, Gurgaon, Noida, Ghaziabad,
+                Faridabad and nearby areas.
+              </p>
 
-            <div className="hero__actions">
-              <a className="button button--primary" href="#rent">
-                Get Started
-              </a>
-              <a
-                className="button button--secondary"
-                href={whatsappLink('Hello, I want to submit a property requirement.')}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {WHATSAPP_DISPLAY}
-              </a>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <a className={primaryButtonClass} href="#rent">
+                  Get Started
+                </a>
+                <a
+                  className={secondaryButtonClass}
+                  href={whatsappLink('Hello, I want to submit a property requirement.')}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {WHATSAPP_DISPLAY}
+                </a>
+              </div>
             </div>
 
-            <dl className="hero__stats">
-              {quickStats.map((stat) => (
-                <div key={stat.label}>
-                  <dt>{stat.value}</dt>
-                  <dd>{stat.label}</dd>
-                </div>
+            <aside className="rounded-lg border border-white/20 bg-white/10 p-5 text-white shadow-2xl shadow-slate-950/20 backdrop-blur-xl sm:p-6">
+              <p className="text-sm font-extrabold text-amber-300">Lead desk</p>
+              <h2 className="mt-2 text-2xl font-black leading-tight">
+                Submit once. Follow up on WhatsApp.
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-white/75">
+                Each form opens a clean lead message with the prospect details,
+                ready for your team to contact.
+              </p>
+
+              <dl className="mt-6 grid gap-3">
+                {quickStats.map((stat) => (
+                  <div
+                    className="rounded-lg border border-white/15 bg-white/10 p-4"
+                    key={stat.label}
+                  >
+                    <dt className="text-2xl font-black">{stat.value}</dt>
+                    <dd className="mt-1 text-sm text-white/70">{stat.label}</dd>
+                  </div>
+                ))}
+              </dl>
+            </aside>
+          </div>
+        </section>
+
+        <section
+          className="bg-white px-4 py-16 sm:px-6 lg:px-10 lg:py-20 xl:px-16"
+          aria-label="Lead categories"
+        >
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1fr] lg:items-end">
+            <div>
+              <p className="mb-3 text-sm font-extrabold uppercase text-amber-600">
+                Lead capture
+              </p>
+              <h2 className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl">
+                Rent, sell, rent out or buy property in one place.
+              </h2>
+            </div>
+            <p className="max-w-2xl text-lg leading-8 text-slate-600">
+              Visitors can submit the right requirement quickly, and every
+              submission opens directly in WhatsApp with clean lead details for
+              follow-up.
+            </p>
+          </div>
+        </section>
+
+        <section
+          className="px-4 py-16 sm:px-6 lg:px-10 lg:py-24 xl:px-16"
+          aria-labelledby="forms-title"
+        >
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 max-w-3xl">
+              <p className="mb-3 text-sm font-extrabold uppercase text-emerald-700">
+                Submit details
+              </p>
+              <h2
+                className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl"
+                id="forms-title"
+              >
+                Choose the property lead you need
+              </h2>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              {leadForms.map((form) => (
+                <LeadForm key={form.id} config={form} />
               ))}
-            </dl>
+            </div>
           </div>
         </section>
 
-        <section className="intro-section" aria-label="Lead categories">
-          <div>
-            <p className="section-kicker">Lead capture</p>
-            <h2>Rent, sell, rent out or buy property in one place.</h2>
-          </div>
-          <p>
-            Visitors can submit the right requirement quickly, and every
-            submission opens directly in WhatsApp with clean lead details for
-            follow-up.
-          </p>
-        </section>
+        <section
+          className="bg-white px-4 py-16 sm:px-6 lg:px-10 lg:py-24 xl:px-16"
+          id="why"
+          aria-labelledby="why-title"
+        >
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 max-w-3xl">
+              <p className="mb-3 text-sm font-extrabold uppercase text-amber-600">
+                Why choose us?
+              </p>
+              <h2
+                className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl"
+                id="why-title"
+              >
+                A faster way to collect Delhi NCR property enquiries.
+              </h2>
+            </div>
 
-        <section className="forms-section" aria-labelledby="forms-title">
-          <div className="section-heading">
-            <p className="section-kicker">Submit details</p>
-            <h2 id="forms-title">Choose the property lead you need</h2>
-          </div>
-
-          <div className="form-grid">
-            {leadForms.map((form) => (
-              <LeadForm key={form.id} config={form} />
-            ))}
-          </div>
-        </section>
-
-        <section className="why-section" id="why" aria-labelledby="why-title">
-          <div className="section-heading">
-            <p className="section-kicker">Why choose us?</p>
-            <h2 id="why-title">A faster way to collect Delhi NCR property enquiries.</h2>
-          </div>
-
-          <div className="feature-grid">
-            {featureCards.map((feature) => (
-              <article className="feature-card" key={feature.title}>
-                <h3>{feature.title}</h3>
-                <p>{feature.text}</p>
-              </article>
-            ))}
+            <div className="grid gap-5 md:grid-cols-3">
+              {featureCards.map((feature, index) => (
+                <article
+                  className="rounded-lg border border-slate-200 bg-[#f9faf7] p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-950/5"
+                  key={feature.title}
+                >
+                  <span className="grid size-10 place-items-center rounded-lg bg-emerald-800 text-sm font-black text-white">
+                    {index + 1}
+                  </span>
+                  <h3 className="mt-5 text-xl font-black text-slate-950">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{feature.text}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="coverage-section" aria-labelledby="coverage-title">
-          <div>
-            <p className="section-kicker">Coverage</p>
-            <h2 id="coverage-title">Active across Delhi NCR</h2>
-          </div>
+        <section
+          className="px-4 py-16 sm:px-6 lg:px-10 lg:py-20 xl:px-16"
+          aria-labelledby="coverage-title"
+        >
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.75fr_1fr] lg:items-center">
+            <div>
+              <p className="mb-3 text-sm font-extrabold uppercase text-emerald-700">
+                Coverage
+              </p>
+              <h2
+                className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl"
+                id="coverage-title"
+              >
+                Active across Delhi NCR
+              </h2>
+            </div>
 
-          <div className="coverage-list">
-            {delhiNcrLocations.slice(0, -1).map((location) => (
-              <span key={location}>{location}</span>
-            ))}
+            <div className="flex flex-wrap gap-3">
+              {delhiNcrLocations.slice(0, -1).map((location) => (
+                <span
+                  className="rounded-full border border-emerald-900/10 bg-white px-4 py-3 text-sm font-extrabold text-slate-800 shadow-sm"
+                  key={location}
+                >
+                  {location}
+                </span>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="cta">
-          <div>
-            <p className="section-kicker">Start today</p>
-            <h2>Start Generating Property Leads Today</h2>
-            <p>Submit your requirement and our team will contact you shortly.</p>
+        <section className="px-4 pb-16 sm:px-6 lg:px-10 lg:pb-24 xl:px-16">
+          <div className="mx-auto grid max-w-7xl gap-6 rounded-lg bg-gradient-to-br from-emerald-900 via-emerald-800 to-amber-900 p-6 text-white shadow-2xl shadow-emerald-950/20 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:p-10">
+            <div>
+              <p className="mb-3 text-sm font-extrabold uppercase text-amber-200">
+                Start today
+              </p>
+              <h2 className="text-3xl font-black leading-tight sm:text-4xl">
+                Start Generating Property Leads Today
+              </h2>
+              <p className="mt-3 max-w-2xl leading-7 text-white/75">
+                Submit your requirement and our team will contact you shortly.
+              </p>
+            </div>
+            <a className={`${primaryButtonClass} w-full sm:w-auto`} href="#rent">
+              Get Started
+            </a>
           </div>
-          <a className="button button--primary" href="#rent">
-            Get Started
-          </a>
         </section>
       </main>
 
-      <footer>
+      <footer className="flex flex-col gap-3 border-t border-slate-200 bg-white px-4 py-6 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-10 xl:px-16">
         <p>&copy; 2026 Delhi NCR Property Leads. All rights reserved.</p>
-        <a href={`tel:+${WHATSAPP_NUMBER}`}>{WHATSAPP_DISPLAY}</a>
+        <a className="font-extrabold text-emerald-800" href={`tel:+${WHATSAPP_NUMBER}`}>
+          {WHATSAPP_DISPLAY}
+        </a>
       </footer>
-    </>
+    </div>
   )
 }
 
