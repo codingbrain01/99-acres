@@ -1,1 +1,6 @@
 @import 'tailwindcss';
+
+@theme {
+  --font-sans: "Aptos", "Segoe UI", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Aptos Display", "Segoe UI", "Inter", ui-sans-serif, system-ui, sans-serif;
+}

@@ -1,4 +1,4 @@
-import type { FormEvent } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import propertyHero from './assets/property-hero.png'
 
 const WHATSAPP_NUMBER = '918800771215'
@@ -22,8 +22,21 @@ type LeadFormConfig = {
   description: string
   subject: string
   submitLabel: string
+  icon: IconName
   fields: LeadField[]
 }
+
+type IconName =
+  | 'arrow'
+  | 'building'
+  | 'check'
+  | 'home'
+  | 'map'
+  | 'phone'
+  | 'shield'
+  | 'spark'
+  | 'timer'
+  | 'whatsapp'
 
 const propertyTypes = [
   'Flat / Apartment',
@@ -43,24 +56,27 @@ const delhiNcrLocations = [
   'Other Delhi NCR',
 ]
 
-const quickStats = [
-  { value: '7+', label: 'Delhi NCR markets' },
-  { value: '3', label: 'lead categories' },
-  { value: 'WhatsApp', label: 'first response' },
+const quickStats: { value: string; label: string; icon: IconName }[] = [
+  { value: '7+', label: 'Delhi NCR markets', icon: 'map' },
+  { value: '3', label: 'lead categories', icon: 'building' },
+  { value: 'WhatsApp', label: 'first response', icon: 'whatsapp' },
 ]
 
-const featureCards = [
+const featureCards: { title: string; text: string; icon: IconName }[] = [
   {
     title: 'Verified Leads',
     text: 'We focus on serious tenants, buyers, sellers and property owners across Delhi NCR.',
+    icon: 'shield',
   },
   {
     title: 'Fast Response',
     text: 'Our team connects with you quickly through phone or WhatsApp.',
+    icon: 'timer',
   },
   {
     title: 'Delhi NCR Coverage',
     text: 'Delhi, Gurgaon, Noida, Greater Noida, Ghaziabad, Faridabad and nearby areas.',
+    icon: 'map',
   },
 ]
 
@@ -72,6 +88,7 @@ const leadForms: LeadFormConfig[] = [
     description: 'Share your preferred location, property type and monthly budget.',
     subject: 'Rental Requirement',
     submitLabel: 'Submit Rental Requirement',
+    icon: 'home',
     fields: [
       {
         name: 'rent_name',
@@ -124,6 +141,7 @@ const leadForms: LeadFormConfig[] = [
     description: 'List your property requirement and connect with active prospects.',
     subject: 'Owner Property Lead',
     submitLabel: 'Submit Property Details',
+    icon: 'building',
     fields: [
       {
         name: 'owner_name',
@@ -184,6 +202,7 @@ const leadForms: LeadFormConfig[] = [
     description: 'Tell us what you want to buy and the team will shortlist options.',
     subject: 'Buying Requirement',
     submitLabel: 'Submit Buying Requirement',
+    icon: 'check',
     fields: [
       {
         name: 'buy_name',
@@ -242,6 +261,81 @@ const primaryButtonClass =
 const secondaryButtonClass =
   'inline-flex min-h-12 items-center justify-center rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-extrabold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20'
 
+function Icon({ name, className = 'size-5' }: { name: IconName; className?: string }) {
+  const paths: Record<IconName, ReactNode> = {
+    arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
+    building: (
+      <>
+        <path d="M4 21V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v16" />
+        <path d="M8 7h1m3 0h1M8 11h1m3 0h1M8 15h1m3 0h1M3 21h18" />
+      </>
+    ),
+    check: (
+      <>
+        <path d="m20 6-11 11-5-5" />
+        <path d="M21 12a9 9 0 1 1-4.7-7.9" />
+      </>
+    ),
+    home: (
+      <>
+        <path d="m3 11 9-8 9 8" />
+        <path d="M5 10v11h14V10" />
+        <path d="M9 21v-6h6v6" />
+      </>
+    ),
+    map: (
+      <>
+        <path d="M9 18 3 21V6l6-3 6 3 6-3v15l-6 3-6-3Z" />
+        <path d="M9 3v15m6-12v15" />
+      </>
+    ),
+    phone: (
+      <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.6 1.9Z" />
+    ),
+    shield: (
+      <>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+        <path d="m9 12 2 2 4-4" />
+      </>
+    ),
+    spark: (
+      <>
+        <path d="m12 3 1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3Z" />
+        <path d="m19 14 .8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14Z" />
+        <path d="m5 14 .8 2.2L8 17l-2.2.8L5 20l-.8-2.2L2 17l2.2-.8L5 14Z" />
+      </>
+    ),
+    timer: (
+      <>
+        <path d="M10 2h4" />
+        <path d="M12 14V9" />
+        <path d="M19 13a7 7 0 1 1-7-7 7 7 0 0 1 7 7Z" />
+      </>
+    ),
+    whatsapp: (
+      <>
+        <path d="M3 21 4.3 17A9 9 0 1 1 8 20.1L3 21Z" />
+        <path d="M9.2 8.7c.2-.5.4-.5.7-.5h.5c.2 0 .4.1.5.4l.7 1.7c.1.3 0 .5-.1.7l-.5.6c-.1.1-.2.3 0 .6.3.5.8 1.1 1.4 1.6.7.6 1.3.9 1.7 1 .2.1.5.1.6-.1l.7-.8c.2-.2.4-.2.7-.1l1.7.8c.3.1.4.3.4.5 0 .4-.2 1.4-.9 1.9-.7.5-1.7.5-2.8.2a9.9 9.9 0 0 1-4.7-3.1 9.5 9.5 0 0 1-2.1-3.7c-.2-.8.1-1.5.5-1.9.3-.4.6-.7 1-.8Z" />
+      </>
+    ),
+  }
+
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.8"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  )
+}
+
 const whatsappLink = (message: string) =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
 
@@ -277,10 +371,15 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
       id={config.id}
     >
       <div className="mb-6 border-b border-slate-100 pb-5">
-        <p className="mb-2 text-xs font-extrabold uppercase text-emerald-700">
-          {config.eyebrow}
-        </p>
-        <h3 className="text-2xl font-black leading-tight text-slate-950">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="grid size-11 place-items-center rounded-lg bg-emerald-50 text-emerald-800 ring-1 ring-emerald-900/10">
+            <Icon name={config.icon} />
+          </span>
+          <p className="text-xs font-extrabold uppercase text-emerald-700">
+            {config.eyebrow}
+          </p>
+        </div>
+        <h3 className="font-display text-2xl font-black leading-tight text-slate-950">
           {config.title}
         </h3>
         <p className="mt-3 text-sm leading-6 text-slate-600">{config.description}</p>
@@ -340,8 +439,9 @@ function LeadForm({ config }: { config: LeadFormConfig }) {
           )
         })}
 
-        <button className={`${primaryButtonClass} mt-2 w-full`} type="submit">
+        <button className={`${primaryButtonClass} mt-2 w-full gap-2`} type="submit">
           {config.submitLabel}
+          <Icon name="arrow" className="size-4" />
         </button>
       </form>
     </article>
@@ -358,10 +458,10 @@ function App() {
             href="#top"
             aria-label="Delhi NCR Property Leads home"
           >
-            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-emerald-950 text-sm font-black text-white">
-              99
+            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-emerald-950 text-white">
+              <Icon name="building" className="size-5" />
             </span>
-            <strong className="max-w-44 text-sm font-black leading-tight text-slate-950 sm:max-w-none sm:text-base">
+            <strong className="font-display max-w-44 text-sm font-black leading-tight text-slate-950 sm:max-w-none sm:text-base">
               Delhi NCR Property Leads
             </strong>
           </a>
@@ -385,11 +485,12 @@ function App() {
           </nav>
 
           <a
-            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg bg-emerald-800 px-4 py-2 text-sm font-extrabold text-white shadow-lg shadow-emerald-900/10 transition hover:-translate-y-0.5 hover:bg-emerald-950 focus:outline-none focus:ring-4 focus:ring-emerald-200"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-emerald-800 px-4 py-2 text-sm font-extrabold text-white shadow-lg shadow-emerald-900/10 transition hover:-translate-y-0.5 hover:bg-emerald-950 focus:outline-none focus:ring-4 focus:ring-emerald-200"
             href={whatsappLink('Hello, I want to discuss property leads in Delhi NCR.')}
             target="_blank"
             rel="noreferrer"
           >
+            <Icon name="whatsapp" className="size-4" />
             WhatsApp
           </a>
         </div>
@@ -410,7 +511,7 @@ function App() {
               <p className="mb-4 text-sm font-extrabold uppercase text-amber-300">
                 Property leads for Delhi NCR
               </p>
-              <h1 className="text-5xl font-black leading-none text-white sm:text-6xl lg:text-7xl">
+              <h1 className="font-display text-5xl font-black leading-none text-white sm:text-6xl lg:text-7xl">
                 Delhi NCR Property Leads
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-white/80">
@@ -420,15 +521,17 @@ function App() {
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a className={primaryButtonClass} href="#rent">
+                <a className={`${primaryButtonClass} gap-2`} href="#rent">
                   Get Started
+                  <Icon name="arrow" className="size-4" />
                 </a>
                 <a
-                  className={secondaryButtonClass}
+                  className={`${secondaryButtonClass} gap-2`}
                   href={whatsappLink('Hello, I want to submit a property requirement.')}
                   target="_blank"
                   rel="noreferrer"
                 >
+                  <Icon name="whatsapp" className="size-4" />
                   {WHATSAPP_DISPLAY}
                 </a>
               </div>
@@ -436,7 +539,7 @@ function App() {
 
             <aside className="rounded-lg border border-white/20 bg-white/10 p-5 text-white shadow-2xl shadow-slate-950/20 backdrop-blur-xl sm:p-6">
               <p className="text-sm font-extrabold text-amber-300">Lead desk</p>
-              <h2 className="mt-2 text-2xl font-black leading-tight">
+              <h2 className="font-display mt-2 text-2xl font-black leading-tight">
                 Submit once. Follow up on WhatsApp.
               </h2>
               <p className="mt-3 text-sm leading-6 text-white/75">
@@ -447,11 +550,16 @@ function App() {
               <dl className="mt-6 grid gap-3">
                 {quickStats.map((stat) => (
                   <div
-                    className="rounded-lg border border-white/15 bg-white/10 p-4"
+                    className="flex items-center gap-4 rounded-lg border border-white/15 bg-white/10 p-4"
                     key={stat.label}
                   >
-                    <dt className="text-2xl font-black">{stat.value}</dt>
-                    <dd className="mt-1 text-sm text-white/70">{stat.label}</dd>
+                    <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-white/10 text-amber-200">
+                      <Icon name={stat.icon} className="size-5" />
+                    </span>
+                    <div>
+                      <dt className="font-display text-2xl font-black">{stat.value}</dt>
+                      <dd className="mt-1 text-sm text-white/70">{stat.label}</dd>
+                    </div>
                   </div>
                 ))}
               </dl>
@@ -468,7 +576,7 @@ function App() {
               <p className="mb-3 text-sm font-extrabold uppercase text-amber-600">
                 Lead capture
               </p>
-              <h2 className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl">
+              <h2 className="font-display text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl">
                 Rent, sell, rent out or buy property in one place.
               </h2>
             </div>
@@ -490,7 +598,7 @@ function App() {
                 Submit details
               </p>
               <h2
-                className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl"
+                className="font-display text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl"
                 id="forms-title"
               >
                 Choose the property lead you need
@@ -516,7 +624,7 @@ function App() {
                 Why choose us?
               </p>
               <h2
-                className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl"
+                className="font-display text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl"
                 id="why-title"
               >
                 A faster way to collect Delhi NCR property enquiries.
@@ -524,15 +632,15 @@ function App() {
             </div>
 
             <div className="grid gap-5 md:grid-cols-3">
-              {featureCards.map((feature, index) => (
+              {featureCards.map((feature) => (
                 <article
                   className="rounded-lg border border-slate-200 bg-[#f9faf7] p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-950/5"
                   key={feature.title}
                 >
-                  <span className="grid size-10 place-items-center rounded-lg bg-emerald-800 text-sm font-black text-white">
-                    {index + 1}
+                  <span className="grid size-11 place-items-center rounded-lg bg-emerald-800 text-white shadow-lg shadow-emerald-900/10">
+                    <Icon name={feature.icon} className="size-5" />
                   </span>
-                  <h3 className="mt-5 text-xl font-black text-slate-950">
+                  <h3 className="font-display mt-5 text-xl font-black text-slate-950">
                     {feature.title}
                   </h3>
                   <p className="mt-3 text-sm leading-6 text-slate-600">{feature.text}</p>
@@ -552,7 +660,7 @@ function App() {
                 Coverage
               </p>
               <h2
-                className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl"
+                className="font-display text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl"
                 id="coverage-title"
               >
                 Active across Delhi NCR
@@ -562,9 +670,10 @@ function App() {
             <div className="flex flex-wrap gap-3">
               {delhiNcrLocations.slice(0, -1).map((location) => (
                 <span
-                  className="rounded-full border border-emerald-900/10 bg-white px-4 py-3 text-sm font-extrabold text-slate-800 shadow-sm"
+                  className="inline-flex items-center gap-2 rounded-full border border-emerald-900/10 bg-white px-4 py-3 text-sm font-extrabold text-slate-800 shadow-sm"
                   key={location}
                 >
+                  <Icon name="map" className="size-4 text-emerald-700" />
                   {location}
                 </span>
               ))}
@@ -578,15 +687,16 @@ function App() {
               <p className="mb-3 text-sm font-extrabold uppercase text-amber-200">
                 Start today
               </p>
-              <h2 className="text-3xl font-black leading-tight sm:text-4xl">
+              <h2 className="font-display text-3xl font-black leading-tight sm:text-4xl">
                 Start Generating Property Leads Today
               </h2>
               <p className="mt-3 max-w-2xl leading-7 text-white/75">
                 Submit your requirement and our team will contact you shortly.
               </p>
             </div>
-            <a className={`${primaryButtonClass} w-full sm:w-auto`} href="#rent">
+            <a className={`${primaryButtonClass} w-full gap-2 sm:w-auto`} href="#rent">
               Get Started
+              <Icon name="arrow" className="size-4" />
             </a>
           </div>
         </section>
