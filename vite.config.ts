@@ -264,6 +264,15 @@ const sendToTelegram = async ({
     }),
   })
 
+const summarizeResponse = async (response: Response) => {
+  try {
+    const body = await response.text()
+    return { status: response.status, body: body.slice(0, 500) }
+  } catch {
+    return { status: response.status, body: '' }
+  }
+}
+
 const readBody = async (request: NodeJS.ReadableStream) =>
   new Promise<string>((resolve, reject) => {
     const chunks: Buffer[] = []
@@ -331,12 +340,18 @@ const telegramLeadDevPlugin = (env: Record<string, string>): Plugin => ({
           return
         }
 
+        const delivery = {
+          sheets: 'skipped',
+          telegram: 'skipped',
+        }
+
         const sheetsResponse = await sendToGoogleSheets(validation, env.GOOGLE_APPS_SCRIPT_URL)
 
         if (!sheetsResponse.ok) {
-          response.statusCode = 502
-          response.end(JSON.stringify({ ok: false, error: 'Google Sheets save failed' }))
-          return
+          delivery.sheets = 'failed'
+          console.error('Google Sheets save failed')
+        } else {
+          delivery.sheets = sheetsResponse.skipped ? 'skipped' : 'sent'
         }
 
         const telegramResponse = await sendToTelegram({
@@ -347,13 +362,20 @@ const telegramLeadDevPlugin = (env: Record<string, string>): Plugin => ({
         })
 
         if (!telegramResponse.ok) {
+          delivery.telegram = 'failed'
+          console.error('Telegram send failed', await summarizeResponse(telegramResponse))
+        } else {
+          delivery.telegram = 'sent'
+        }
+
+        if (delivery.sheets !== 'sent' && delivery.telegram !== 'sent') {
           response.statusCode = 502
-          response.end(JSON.stringify({ ok: false, error: 'Telegram send failed' }))
+          response.end(JSON.stringify({ ok: false, error: 'Lead delivery failed', delivery }))
           return
         }
 
         response.statusCode = 200
-        response.end(JSON.stringify({ ok: true }))
+        response.end(JSON.stringify({ ok: true, delivery }))
       } catch {
         response.statusCode = 400
         response.end(JSON.stringify({ ok: false, error: 'Invalid request' }))

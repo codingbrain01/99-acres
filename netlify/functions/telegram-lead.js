@@ -268,6 +268,15 @@ const sendToTelegram = async ({ botToken, chatId, lead }) =>
     }),
   })
 
+const summarizeResponse = async (response) => {
+  try {
+    const body = await response.text()
+    return { status: response.status, body: body.slice(0, 500) }
+  } catch {
+    return { status: response.status, body: '' }
+  }
+}
+
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return json(405, { ok: false, error: 'Method not allowed' })
@@ -305,13 +314,18 @@ export const handler = async (event) => {
       return json(400, { ok: false, error: validation.error })
     }
 
+    const delivery = {
+      sheets: 'skipped',
+      telegram: 'skipped',
+    }
+
     const sheetsResponse = await sendToGoogleSheets(validation)
 
     if (!sheetsResponse.ok) {
-      return json(502, {
-        ok: false,
-        error: 'Google Sheets save failed',
-      })
+      delivery.sheets = 'failed'
+      console.error('Google Sheets save failed')
+    } else {
+      delivery.sheets = sheetsResponse.skipped ? 'skipped' : 'sent'
     }
 
     const telegramResponse = await sendToTelegram({
@@ -321,13 +335,21 @@ export const handler = async (event) => {
     })
 
     if (!telegramResponse.ok) {
+      delivery.telegram = 'failed'
+      console.error('Telegram send failed', await summarizeResponse(telegramResponse))
+    } else {
+      delivery.telegram = 'sent'
+    }
+
+    if (delivery.sheets !== 'sent' && delivery.telegram !== 'sent') {
       return json(502, {
         ok: false,
-        error: 'Telegram send failed',
+        error: 'Lead delivery failed',
+        delivery,
       })
     }
 
-    return json(200, { ok: true })
+    return json(200, { ok: true, delivery })
   } catch {
     return json(400, { ok: false, error: 'Invalid request' })
   }
